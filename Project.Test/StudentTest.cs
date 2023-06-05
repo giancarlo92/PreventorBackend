@@ -32,6 +32,8 @@ namespace Project.Test
             var result = await _repository.Add(student);
             Assert.IsNotNull(result);
             Assert.IsTrue(result > 0);
+
+            await RemoveStudentTest(result);
         }
 
         [TestMethod]

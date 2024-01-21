@@ -19,5 +19,7 @@ namespace Project.Entities.Model
         public string Email { get; set; }
         [Column("phone")]
         public string Phone { get; set; }
+
+        public virtual ICollection<StudentCourse> StudentCourses { get; set; }
     }
 }

@@ -23,6 +23,13 @@ namespace Project.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("Courses")]
+        public async Task<ActionResult> GetWithRelations()
+        {
+            var result = await _repository.GetWithRelations();
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {

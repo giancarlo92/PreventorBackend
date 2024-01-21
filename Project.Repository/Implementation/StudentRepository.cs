@@ -32,6 +32,11 @@ namespace Project.Repository.Implementation
             return await _context.Student.AsNoTracking().ToListAsync();
         }
 
+        public async Task<List<Student>> GetWithRelations()
+        {
+            return await _context.Student.Include(x => x.StudentCourses).ThenInclude(x => x.Course).AsNoTracking().ToListAsync();
+        } 
+
         public async Task<Student> GetById(int id)
         {
             return await _context.Student.AsNoTracking().FirstOrDefaultAsync(x => x.StudentId.Equals(id));

@@ -4,6 +4,11 @@ using Project.Data;
 using Project.Repository.Implementation;
 using Project.Repository.Interfaces;
 using Swashbuckle.AspNetCore.Filters;
+using GraphQL.Server.Ui.Voyager;
+using Microsoft.AspNetCore.Builder;
+using System.Text.Json.Serialization;
+using Project.Api.GraphQL.Types;
+using Project.Api.GraphQL;
 
 namespace Project.Api
 {
@@ -17,7 +22,12 @@ namespace Project.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services
+                .AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                });
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
@@ -26,12 +36,25 @@ namespace Project.Api
             });
             services.AddSwaggerExamplesFromAssemblyOf<Startup>();
 
-            services.AddDbContext<PreventorDBContext>(options =>
+            services.AddDbContextFactory<PreventorDBContext>(options =>
             {
                 options.UseNpgsql(Configuration.GetConnectionString("PreventorConnection"));
-            });
+            }, ServiceLifetime.Transient);
 
             services.AddScoped<IStudentRepository, StudentRepository>();
+
+            services
+                .AddGraphQLServer()
+                //.RegisterDbContext<PreventorDBContext>()
+                .AddQueryType<Query>()
+                .AddMutationType<Mutation>()
+                .AddSubscriptionType<Subscription>()
+                .AddType<StudentType>()
+                .AddFiltering()
+                .AddSorting()
+                //.AddProjections()
+                .AddInMemorySubscriptions()
+                .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -60,7 +83,11 @@ namespace Project.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGraphQL();
+                endpoints.MapGraphQLVoyager("ui/voyager");
             });
+
+            app.UseWebSockets();
         }
     }
 }

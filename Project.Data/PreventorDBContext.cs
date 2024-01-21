@@ -10,6 +10,8 @@ namespace Project.Data
         }
 
         public virtual DbSet<Student> Student { get; set; }
+        public virtual DbSet<Course> Course { get; set; }
+        public virtual DbSet<StudentCourse> StudentCourse { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,12 +20,33 @@ namespace Project.Data
                 entity.ToTable("student", "public");
 
                 entity.HasKey(x => x.StudentId);
+                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Surname).IsRequired();
+            });
 
-                entity.Property(e => e.Name)
-                    .IsRequired();
+            modelBuilder.Entity<Course>(entity =>
+            {
+                entity.ToTable("course", "public");
 
-                entity.Property(e => e.Surname)
-                    .IsRequired();
+                entity.HasKey(x => x.CourseId);
+                entity.Property(e => e.Name).IsRequired();
+            });
+
+            modelBuilder.Entity<StudentCourse>(entity =>
+            {
+                entity.ToTable("studentcourse", "public");
+
+                entity.HasKey(sc => new { sc.StudentId, sc.CourseId });
+
+                entity
+                    .HasOne(sc => sc.Student)
+                    .WithMany(s => s.StudentCourses)
+                    .HasForeignKey(sc => sc.StudentId);
+
+                entity
+                    .HasOne(sc => sc.Course)
+                    .WithMany(c => c.StudentCourses)
+                    .HasForeignKey(sc => sc.CourseId);
             });
 
             OnModelCreatingPartial(modelBuilder);

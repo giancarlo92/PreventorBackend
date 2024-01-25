@@ -12,6 +12,7 @@ namespace Project.Data
         public virtual DbSet<Student> Student { get; set; }
         public virtual DbSet<Course> Course { get; set; }
         public virtual DbSet<StudentCourse> StudentCourse { get; set; }
+        public virtual DbSet<Employee> Employee { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +48,13 @@ namespace Project.Data
                     .HasOne(sc => sc.Course)
                     .WithMany(c => c.StudentCourses)
                     .HasForeignKey(sc => sc.CourseId);
+            });
+
+            modelBuilder.Entity<Employee>(entity =>
+            {
+                entity.ToTable("empleado", "public");
+
+                entity.HasKey(x => x.Id);
             });
 
             OnModelCreatingPartial(modelBuilder);

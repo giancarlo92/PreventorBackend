@@ -42,6 +42,7 @@ namespace Project.Api
             }, ServiceLifetime.Transient);
 
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
             services
                 .AddGraphQLServer()
